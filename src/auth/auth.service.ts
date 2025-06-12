@@ -208,28 +208,6 @@ export class AuthService {
     };
   }
 
-  async resetPassword(
-    resetPasswordDto: ResetPasswordDto,
-  ): Promise<{ statusCode: number; message: string }> {
-    const user = await this.usersService.findByEmail(resetPasswordDto.email);
-    if (!user) throw new NotFoundException('User does not exist');
-
-    if (user.resetToken !== resetPasswordDto.token) {
-      throw new BadRequestException('Invalid or expired reset token');
-    }
-
-    const hashedPassword = await this.hashData(resetPasswordDto.newPassword);
-    await this.usersService.update(user._id.toString(), {
-      password: hashedPassword,
-      resetToken: null,
-    });
-
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Password reset successfully',
-    };
-  }
-
   private generateResetToken(): string {
     return Math.floor(10000 + Math.random() * 90000).toString();
   }
